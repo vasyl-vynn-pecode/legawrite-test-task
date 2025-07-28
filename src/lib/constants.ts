@@ -1,6 +1,6 @@
 export const VOTING_CONFIG = {
   MAX_VOTES_PER_USER: 3,
-  POLL_INTERVAL: 5000, // 5 seconds
+  POLL_INTERVAL: 3000, // 5 seconds
   VOTE_COOLDOWN: 1000, // 1 second between votes
   SESSION_DURATION: 30 * 60 * 1000, // 30 minutes
 } as const;

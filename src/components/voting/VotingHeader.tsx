@@ -4,6 +4,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Clock, Trophy, Vote, Users } from 'lucide-react';
 import { getTimeRemaining } from '@/utils';
+import { AnimatedCounter, PulsingCounter } from '@/components/ui/AnimatedCounter';
 
 interface VotingHeaderProps {
   isVotingActive: boolean;
@@ -72,7 +73,11 @@ export function VotingHeader({
                 <span className="text-sm font-medium text-white">Your Votes</span>
               </div>
               <div className="text-2xl font-bold text-white">
-                {remainingVotes}/{maxVotes}
+                <AnimatedCounter 
+                  value={remainingVotes} 
+                  className="inline"
+                  duration={800}
+                />/{maxVotes}
               </div>
             </motion.div>
 
@@ -85,7 +90,11 @@ export function VotingHeader({
                 <span className="text-sm font-medium text-white">Total Votes</span>
               </div>
               <div className="text-2xl font-bold text-white">
-                {totalVotes.toLocaleString()}
+                <PulsingCounter 
+                  value={totalVotes}
+                  className="text-2xl font-bold text-white"
+                  pulseColor="rgb(250, 204, 21)" // yellow-400
+                />
               </div>
             </motion.div>
 
@@ -98,9 +107,20 @@ export function VotingHeader({
                 <span className="text-sm font-medium text-white">Status</span>
               </div>
               <div className="text-2xl font-bold text-white">
-                <span className={`inline-block w-3 h-3 rounded-full mr-2 ${
-                  isVotingActive ? 'bg-green-400' : 'bg-red-400'
-                }`}></span>
+                <motion.span 
+                  className={`inline-block w-3 h-3 rounded-full mr-2 ${
+                    isVotingActive ? 'bg-green-400' : 'bg-red-400'
+                  }`}
+                  animate={isVotingActive ? {
+                    scale: [1, 1.2, 1],
+                    opacity: [1, 0.7, 1]
+                  } : {}}
+                  transition={{
+                    duration: 2,
+                    repeat: isVotingActive ? Infinity : 0,
+                    ease: 'easeInOut'
+                  }}
+                />
                 {isVotingActive ? 'LIVE' : 'ENDED'}
               </div>
             </motion.div>
