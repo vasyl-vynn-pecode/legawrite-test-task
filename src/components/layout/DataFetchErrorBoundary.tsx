@@ -17,7 +17,10 @@ interface DataFetchErrorBoundaryState {
   isRetrying: boolean;
 }
 
-class DataFetchErrorBoundary extends React.Component<DataFetchErrorBoundaryProps, DataFetchErrorBoundaryState> {
+class DataFetchErrorBoundary extends React.Component<
+  DataFetchErrorBoundaryProps,
+  DataFetchErrorBoundaryState
+> {
   private maxRetries = 3;
   private retryTimeout: NodeJS.Timeout | null = null;
 
@@ -31,7 +34,9 @@ class DataFetchErrorBoundary extends React.Component<DataFetchErrorBoundaryProps
     };
   }
 
-  static getDerivedStateFromError(error: Error): Partial<DataFetchErrorBoundaryState> {
+  static getDerivedStateFromError(
+    error: Error
+  ): Partial<DataFetchErrorBoundaryState> {
     return {
       hasError: true,
       error,
@@ -48,31 +53,39 @@ class DataFetchErrorBoundary extends React.Component<DataFetchErrorBoundaryProps
     });
 
     // Auto-retry for data fetch errors (but not for component errors)
-    if (this.isDataFetchError(error) && this.state.retryCount < this.maxRetries) {
+    if (
+      this.isDataFetchError(error) &&
+      this.state.retryCount < this.maxRetries
+    ) {
       this.autoRetry();
     }
   }
 
   private isDataFetchError = (error: Error): boolean => {
     const message = error.message.toLowerCase();
-    return message.includes('fetch') || 
-           message.includes('network') || 
-           message.includes('load') ||
-           message.includes('timeout') ||
-           message.includes('connection');
+    return (
+      message.includes('fetch') ||
+      message.includes('network') ||
+      message.includes('load') ||
+      message.includes('timeout') ||
+      message.includes('connection')
+    );
   };
 
   private autoRetry = () => {
     this.setState({ isRetrying: true });
-    
-    this.retryTimeout = setTimeout(() => {
-      this.setState(prevState => ({
-        hasError: false,
-        error: null,
-        retryCount: prevState.retryCount + 1,
-        isRetrying: false,
-      }));
-    }, 2000 * (this.state.retryCount + 1)); // Exponential backoff
+
+    this.retryTimeout = setTimeout(
+      () => {
+        this.setState(prevState => ({
+          hasError: false,
+          error: null,
+          retryCount: prevState.retryCount + 1,
+          isRetrying: false,
+        }));
+      },
+      2000 * (this.state.retryCount + 1)
+    ); // Exponential backoff
   };
 
   retry = () => {
@@ -97,8 +110,8 @@ class DataFetchErrorBoundary extends React.Component<DataFetchErrorBoundaryProps
     if (this.state.hasError && this.state.error) {
       const FallbackComponent = this.props.fallback || DataFetchErrorFallback;
       return (
-        <FallbackComponent 
-          error={this.state.error} 
+        <FallbackComponent
+          error={this.state.error}
           retry={this.retry}
           retryCount={this.state.retryCount}
           maxRetries={this.maxRetries}
@@ -119,12 +132,12 @@ interface DataFetchErrorFallbackProps {
   isRetrying?: boolean;
 }
 
-function DataFetchErrorFallback({ 
-  error, 
-  retry, 
-  retryCount = 0, 
+function DataFetchErrorFallback({
+  error,
+  retry,
+  retryCount = 0,
   maxRetries = 3,
-  isRetrying = false 
+  isRetrying = false,
 }: DataFetchErrorFallbackProps) {
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
@@ -136,7 +149,11 @@ function DataFetchErrorFallback({
       >
         <motion.div
           animate={isRetrying ? { rotate: 360 } : {}}
-          transition={{ duration: 2, repeat: isRetrying ? Infinity : 0, ease: "linear" }}
+          transition={{
+            duration: 2,
+            repeat: isRetrying ? Infinity : 0,
+            ease: 'linear',
+          }}
           className="mb-6"
         >
           {isRetrying ? (
@@ -151,14 +168,12 @@ function DataFetchErrorFallback({
         </h2>
 
         <p className="text-gray-600 mb-2">
-          {isRetrying 
+          {isRetrying
             ? 'Attempting to reload contestant data...'
             : 'Unable to load the voting data. Please check your connection and try again.'}
         </p>
 
-        <p className="text-sm text-gray-500 mb-6">
-          {error.message}
-        </p>
+        <p className="text-sm text-gray-500 mb-6">{error.message}</p>
 
         {retryCount > 0 && (
           <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded">
@@ -173,11 +188,7 @@ function DataFetchErrorFallback({
 
         {!isRetrying && (
           <div className="space-y-3">
-            <Button
-              onClick={retry}
-              className="w-full"
-              disabled={isRetrying}
-            >
+            <Button onClick={retry} className="w-full" disabled={isRetrying}>
               <RefreshCw className="w-4 h-4 mr-2" />
               Try Again
             </Button>
@@ -193,10 +204,12 @@ function DataFetchErrorFallback({
         )}
 
         <div className="mt-6 text-left">
-          <p className="text-sm font-medium text-gray-700 mb-2">Troubleshooting tips:</p>
+          <p className="text-sm font-medium text-gray-700 mb-2">
+            Troubleshooting tips:
+          </p>
           <ul className="text-sm text-gray-600 space-y-1">
             <li>• Check your internet connection</li>
-            <li>• Disable VPN if you're using one</li>
+            <li>• Disable VPN if you&apos;re using one</li>
             <li>• Try a different network</li>
             <li>• Clear browser cache and cookies</li>
           </ul>

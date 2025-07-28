@@ -7,7 +7,11 @@ import { Button } from '@/components/ui/Button';
 
 interface VotingErrorBoundaryProps {
   children: React.ReactNode;
-  fallback?: React.ComponentType<{ error: Error; retry: () => void; resetErrorBoundary: () => void }>;
+  fallback?: React.ComponentType<{
+    error: Error;
+    retry: () => void;
+    resetErrorBoundary: () => void;
+  }>;
 }
 
 interface VotingErrorBoundaryState {
@@ -17,7 +21,10 @@ interface VotingErrorBoundaryState {
   errorId: string;
 }
 
-class VotingErrorBoundary extends React.Component<VotingErrorBoundaryProps, VotingErrorBoundaryState> {
+class VotingErrorBoundary extends React.Component<
+  VotingErrorBoundaryProps,
+  VotingErrorBoundaryState
+> {
   private retryTimeoutId: NodeJS.Timeout | null = null;
 
   constructor(props: VotingErrorBoundaryProps) {
@@ -30,7 +37,9 @@ class VotingErrorBoundary extends React.Component<VotingErrorBoundaryProps, Voti
     };
   }
 
-  static getDerivedStateFromError(error: Error): Partial<VotingErrorBoundaryState> {
+  static getDerivedStateFromError(
+    error: Error
+  ): Partial<VotingErrorBoundaryState> {
     return {
       hasError: true,
       error,
@@ -40,7 +49,7 @@ class VotingErrorBoundary extends React.Component<VotingErrorBoundaryProps, Voti
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     this.setState({ errorInfo });
-    
+
     // Log error details for debugging
     console.error('VotingErrorBoundary caught an error:', {
       error: error.message,
@@ -58,15 +67,24 @@ class VotingErrorBoundary extends React.Component<VotingErrorBoundaryProps, Voti
   private reportError = (error: Error, errorInfo: React.ErrorInfo) => {
     // In a real app, you would send this to your error reporting service
     // like Sentry, Bugsnag, or custom analytics
-    if (typeof window !== 'undefined' && window.gtag) {
-      window.gtag('event', 'exception', {
-        description: error.message,
-        fatal: false,
-        custom_map: {
-          error_boundary: 'VotingErrorBoundary',
-          component_stack: errorInfo.componentStack,
-        },
-      });
+    if (
+      typeof window !== 'undefined' &&
+      'gtag' in window &&
+      typeof (window as unknown as { gtag?: (...args: unknown[]) => void })
+        .gtag === 'function'
+    ) {
+      (window as unknown as { gtag: (...args: unknown[]) => void }).gtag(
+        'event',
+        'exception',
+        {
+          description: error.message,
+          fatal: false,
+          custom_map: {
+            error_boundary: 'VotingErrorBoundary',
+            component_stack: errorInfo.componentStack,
+          },
+        }
+      );
     }
   };
 
@@ -124,10 +142,14 @@ interface VotingErrorFallbackProps {
   resetErrorBoundary: () => void;
 }
 
-function VotingErrorFallback({ error, retry, resetErrorBoundary }: VotingErrorFallbackProps) {
+function VotingErrorFallback({
+  error,
+  retry,
+}: Omit<VotingErrorFallbackProps, 'resetErrorBoundary'>) {
   const isVotingError = error.message.toLowerCase().includes('vote');
-  const isDataFetchError = error.message.toLowerCase().includes('fetch') || 
-                          error.message.toLowerCase().includes('load');
+  const isDataFetchError =
+    error.message.toLowerCase().includes('fetch') ||
+    error.message.toLowerCase().includes('load');
 
   return (
     <motion.div
@@ -147,24 +169,22 @@ function VotingErrorFallback({ error, retry, resetErrorBoundary }: VotingErrorFa
 
       <div className="text-center max-w-md">
         <h2 className="text-2xl font-bold text-red-800 mb-3">
-          {isVotingError 
-            ? 'Voting Error' 
-            : isDataFetchError 
+          {isVotingError
+            ? 'Voting Error'
+            : isDataFetchError
               ? 'Data Loading Error'
               : 'Something Went Wrong'}
         </h2>
-        
+
         <p className="text-red-700 mb-2 font-medium">
-          {isVotingError 
+          {isVotingError
             ? 'There was a problem submitting your vote.'
             : isDataFetchError
               ? 'Unable to load contestant data.'
               : 'An unexpected error occurred in the voting system.'}
         </p>
-        
-        <p className="text-red-600 text-sm mb-6">
-          {error.message}
-        </p>
+
+        <p className="text-red-600 text-sm mb-6">{error.message}</p>
 
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <Button
@@ -175,7 +195,7 @@ function VotingErrorFallback({ error, retry, resetErrorBoundary }: VotingErrorFa
             <RefreshCw className="w-4 h-4" />
             Try Again
           </Button>
-          
+
           <Button
             onClick={() => window.location.reload()}
             variant="outline"
