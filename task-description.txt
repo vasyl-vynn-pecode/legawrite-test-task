@@ -1,0 +1,18 @@
+Build a system that allows the public to vote live for contestants during an America's Got Talent-style show.
+The app should display a list of active contestants, let users cast limited votes during a live voting window, and update in real time to reflect current vote trends or statuses.
+It should be reliable, responsive across devices, and handle failure gracefully.
+Use React with NextJS
+What we will look for:
+1. Create reusable custom hooks to manage contestant voting logic, ensuring state is isolated per contestant and scalable across the app.
+2. Implement error boundaries to catch and display fallback UIs when parts of the app fail, such as data fetch or vote submission.
+3. Design a responsive layout so the voting interface adapts smoothly across mobile, tablet, and desktop screen sizes.
+4. Validate and handle form input to enforce vote limits, prevent duplicate votes, and give clear user feedback on errors.
+5. Simulate live data updates (e.g. changing vote counts) using polling or timers to mimic real-time voting behavior.
+6. Structure components and state to reflect a clean separation of concerns and testable logic.
+7. Gracefully handle loading and failure states so the system remains usable and informative even under degraded conditions.
+
+Deliver:
+1. Proper specification: business and technical
+2. All prompts used to code the assigment
+3. Folder with the app
+4. Tests that the "Vote" button disables after voting and remains disabled even after a page reload, using localStorage to persist vote state.
