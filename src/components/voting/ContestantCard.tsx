@@ -6,7 +6,7 @@ import { Heart, Trophy, Users } from 'lucide-react';
 import { Card, CardContent, CardFooter } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Contestant } from '@/types';
-import { formatVoteCount, cn } from '@/utils';
+import { cn } from '@/utils';
 import { PulsingCounter } from '@/components/ui/AnimatedCounter';
 import { useConfetti } from '@/components/ui/ConfettiAnimation';
 
@@ -99,11 +99,12 @@ export function ContestantCard({
               <div className="flex items-center space-x-2">
                 <Trophy className="w-4 h-4 text-yellow-500" />
                 <span className="text-sm font-medium text-gray-700">
-                  <PulsingCounter 
+                  <PulsingCounter
                     value={contestant.voteCount}
                     className="text-sm font-medium text-gray-700"
                     pulseColor="rgb(34, 197, 94)" // green-500
-                  /> votes
+                  />{' '}
+                  votes
                 </span>
               </div>
               <div className="flex items-center space-x-2">
@@ -129,7 +130,9 @@ export function ContestantCard({
 
         <CardFooter className="p-4 pt-0">
           <motion.div
-            whileHover={canVote && !hasVoted && !isVoting ? { scale: 1.02 } : {}}
+            whileHover={
+              canVote && !hasVoted && !isVoting ? { scale: 1.02 } : {}
+            }
             whileTap={canVote && !hasVoted && !isVoting ? { scale: 0.98 } : {}}
             className="w-full"
           >
@@ -139,7 +142,9 @@ export function ContestantCard({
               size="lg"
               className="w-full"
               onClick={handleVote}
-              disabled={!canVote || hasVoted || isVoting || !contestant.isActive}
+              disabled={
+                !canVote || hasVoted || isVoting || !contestant.isActive
+              }
               loading={isVoting}
             >
               {hasVoted

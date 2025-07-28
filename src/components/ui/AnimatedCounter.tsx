@@ -22,12 +22,12 @@ export function AnimatedCounter({
   suffix = '',
   decimals = 0,
   formatter,
-  animationTrigger = true
+  animationTrigger = true,
 }: AnimatedCounterProps) {
   const [displayValue, setDisplayValue] = useState(value);
   const [isAnimating, setIsAnimating] = useState(false);
   const previousValue = useRef(value);
-  const animationRef = useRef<number>();
+  const animationRef = useRef<number | undefined>(undefined);
 
   useEffect(() => {
     if (!animationTrigger || value === previousValue.current) return;
@@ -40,11 +40,11 @@ export function AnimatedCounter({
     const animate = () => {
       const elapsed = Date.now() - startTime;
       const progress = Math.min(elapsed / duration, 1);
-      
+
       // Easing function for smooth animation
       const easeOutCubic = 1 - Math.pow(1 - progress, 3);
-      const currentValue = startValue + (difference * easeOutCubic);
-      
+      const currentValue = startValue + difference * easeOutCubic;
+
       setDisplayValue(currentValue);
 
       if (progress < 1) {
@@ -59,7 +59,7 @@ export function AnimatedCounter({
     if (animationRef.current) {
       cancelAnimationFrame(animationRef.current);
     }
-    
+
     animationRef.current = requestAnimationFrame(animate);
 
     return () => {
@@ -71,7 +71,7 @@ export function AnimatedCounter({
 
   const formatValue = (val: number) => {
     if (formatter) return formatter(val);
-    
+
     const rounded = Number(val.toFixed(decimals));
     return rounded.toLocaleString();
   };
@@ -83,11 +83,13 @@ export function AnimatedCounter({
       className={`${className} ${isAnimating ? 'text-green-500' : ''}`}
       animate={{
         scale: isAnimating ? [1, 1.1, 1] : 1,
-        color: isAnimating ? ['currentColor', '#22c55e', 'currentColor'] : 'currentColor'
+        color: isAnimating
+          ? ['currentColor', '#22c55e', 'currentColor']
+          : 'currentColor',
       }}
       transition={{
         scale: { duration: 0.3, ease: 'easeInOut' },
-        color: { duration: 0.5, ease: 'easeInOut' }
+        color: { duration: 0.5, ease: 'easeInOut' },
       }}
     >
       {formattedValue}
@@ -122,7 +124,7 @@ export function FlipNumber({ value, className = '' }: FlipNumberProps) {
           exit={{ y: value > previousValue ? -20 : 20, opacity: 0 }}
           transition={{
             duration: 0.3,
-            ease: 'easeInOut'
+            ease: 'easeInOut',
           }}
           className="inline-block"
         >
@@ -140,10 +142,10 @@ interface PulsingCounterProps {
   pulseColor?: string;
 }
 
-export function PulsingCounter({ 
-  value, 
-  className = '', 
-  pulseColor = 'rgb(34, 197, 94)' // green-500
+export function PulsingCounter({
+  value,
+  className = '',
+  pulseColor = 'rgb(34, 197, 94)', // green-500
 }: PulsingCounterProps) {
   const [shouldPulse, setShouldPulse] = useState(false);
   const previousValue = useRef(value);
@@ -163,11 +165,13 @@ export function PulsingCounter({
       className={className}
       animate={{
         scale: shouldPulse ? [1, 1.15, 1] : 1,
-        color: shouldPulse ? [pulseColor, pulseColor, 'currentColor'] : 'currentColor'
+        color: shouldPulse
+          ? [pulseColor, pulseColor, 'currentColor']
+          : 'currentColor',
       }}
       transition={{
         duration: 0.6,
-        ease: 'easeInOut'
+        ease: 'easeInOut',
       }}
     >
       {value.toLocaleString()}

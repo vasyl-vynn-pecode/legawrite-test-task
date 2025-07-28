@@ -34,7 +34,7 @@ export function VotingHeader({
     };
 
     updateTimer();
-    
+
     // Only update timer if voting is active
     if (isVotingActive) {
       const interval = setInterval(updateTimer, 1000);
@@ -109,19 +109,19 @@ export function VotingHeader({
           >
             {/* Glowing background */}
             <div className="absolute inset-0 bg-gradient-to-r from-red-500/30 to-pink-500/30 rounded-xl blur-xl opacity-75 group-hover:opacity-100 transition-opacity duration-300" />
-            
+
             {/* Button content */}
             <div className="relative bg-white/15 backdrop-blur-xl border border-red-300/40 rounded-xl px-4 py-2 shadow-2xl hover:shadow-red-500/25 transition-all duration-300">
               <div className="flex items-center space-x-2">
                 <motion.div
-                  animate={{ 
+                  animate={{
                     scale: [1, 1.1, 1],
-                    rotate: [0, 180, 360]
+                    rotate: [0, 180, 360],
                   }}
-                  transition={{ 
-                    duration: 2, 
-                    repeat: Infinity, 
-                    ease: "easeInOut" 
+                  transition={{
+                    duration: 2,
+                    repeat: Infinity,
+                    ease: 'easeInOut',
                   }}
                 >
                   <Square className="w-4 h-4 fill-red-400 text-red-400" />
@@ -154,10 +154,10 @@ export function VotingHeader({
             }}
           >
             <span className="relative">
-              America's Got Talent
+              America&apos;s Got Talent
               {/* Strong background shadow for contrast */}
               <div className="absolute inset-0 text-white blur-sm opacity-50 -z-10">
-                America's Got Talent
+                America&apos;s Got Talent
               </div>
             </span>
           </motion.h1>
