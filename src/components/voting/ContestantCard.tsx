@@ -1,12 +1,14 @@
 'use client';
 
-import React from 'react';
+import React, { useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Heart, Trophy, Users } from 'lucide-react';
 import { Card, CardContent, CardFooter } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Contestant } from '@/types';
-import { formatVoteCount, cn } from '@/utils';
+import { cn } from '@/utils';
+import { PulsingCounter } from '@/components/ui/AnimatedCounter';
+import { useConfetti } from '@/components/ui/ConfettiAnimation';
 
 interface ContestantCardProps {
   contestant: Contestant;
@@ -25,8 +27,13 @@ export function ContestantCard({
   canVote,
   remainingVotes,
 }: ContestantCardProps) {
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const { triggerConfetti } = useConfetti();
+
   const handleVote = () => {
     if (canVote && !hasVoted && !isVoting) {
+      // Trigger confetti animation from button position
+      triggerConfetti(buttonRef.current, 'heart');
       onVote(contestant.id);
     }
   };
@@ -92,7 +99,12 @@ export function ContestantCard({
               <div className="flex items-center space-x-2">
                 <Trophy className="w-4 h-4 text-yellow-500" />
                 <span className="text-sm font-medium text-gray-700">
-                  {formatVoteCount(contestant.voteCount)} votes
+                  <PulsingCounter
+                    value={contestant.voteCount}
+                    className="text-sm font-medium text-gray-700"
+                    pulseColor="rgb(34, 197, 94)" // green-500
+                  />{' '}
+                  votes
                 </span>
               </div>
               <div className="flex items-center space-x-2">
@@ -117,24 +129,35 @@ export function ContestantCard({
         </CardContent>
 
         <CardFooter className="p-4 pt-0">
-          <Button
-            variant="vote"
-            size="lg"
+          <motion.div
+            whileHover={
+              canVote && !hasVoted && !isVoting ? { scale: 1.02 } : {}
+            }
+            whileTap={canVote && !hasVoted && !isVoting ? { scale: 0.98 } : {}}
             className="w-full"
-            onClick={handleVote}
-            disabled={!canVote || hasVoted || isVoting || !contestant.isActive}
-            loading={isVoting}
           >
-            {hasVoted
-              ? 'Voted!'
-              : !contestant.isActive
-                ? 'Voting Closed'
-                : !canVote
-                  ? `No votes left`
-                  : isVoting
-                    ? 'Voting...'
-                    : `Vote (${remainingVotes} left)`}
-          </Button>
+            <Button
+              ref={buttonRef}
+              variant="vote"
+              size="lg"
+              className="w-full"
+              onClick={handleVote}
+              disabled={
+                !canVote || hasVoted || isVoting || !contestant.isActive
+              }
+              loading={isVoting}
+            >
+              {hasVoted
+                ? 'Voted!'
+                : !contestant.isActive
+                  ? 'Voting Closed'
+                  : !canVote
+                    ? `No votes left`
+                    : isVoting
+                      ? 'Voting...'
+                      : `Vote (${remainingVotes} left)`}
+            </Button>
+          </motion.div>
         </CardFooter>
       </Card>
     </motion.div>

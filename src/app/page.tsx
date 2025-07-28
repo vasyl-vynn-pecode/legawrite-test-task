@@ -13,15 +13,21 @@ import { useLiveUpdates } from '@/hooks/useLiveUpdates';
 import { VOTING_CONFIG } from '@/lib/constants';
 
 export default function VotingPage() {
-  const [votingSession] = React.useState(mockVotingSession);
+  const [votingSession, setVotingSession] = React.useState(mockVotingSession);
   const [isLoading, setIsLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
-  const [votingStates, setVotingStates] = React.useState<Record<string, boolean>>({});
+  const [votingStates, setVotingStates] = React.useState<
+    Record<string, boolean>
+  >({});
+  const [votingStopped, setVotingStopped] = React.useState(false);
 
   // Use custom hooks for isolated state management
-  const { voteState, canVote, hasVotedFor, recordVote, isInitialized } = useVoteLimit();
-  const isVotingActive = votingSession.isActive && Date.now() < votingSession.endTime;
-  const { contestants, updateContestantVotes } = useLiveUpdates({
+  const { voteState, canVote, hasVotedFor, recordVote } = useVoteLimit();
+  const isVotingActive =
+    !votingStopped &&
+    votingSession.isActive &&
+    Date.now() < votingSession.endTime;
+  const { contestants, updateContestantVotes, stopPolling } = useLiveUpdates({
     initialContestants: mockContestants,
     isActive: isVotingActive,
   });
@@ -31,18 +37,22 @@ export default function VotingPage() {
     const loadData = async () => {
       try {
         setIsLoading(true);
-        
+
         // Simulate potential data fetch failure for testing error boundaries
-        if (Math.random() < 0.05) { // 5% chance of failure
+        if (Math.random() < 0.05) {
+          // 5% chance of failure
           throw new Error('Failed to fetch contestant data from server');
         }
-        
+
         // Simulate API call delay
         await new Promise(resolve => setTimeout(resolve, 1000));
-        
+
         setError(null);
       } catch (err) {
-        const error = err instanceof Error ? err.message : 'Failed to load voting data. Please try again.';
+        const error =
+          err instanceof Error
+            ? err.message
+            : 'Failed to load voting data. Please try again.';
         setError(error);
         throw err; // Re-throw to trigger error boundary
       } finally {
@@ -54,7 +64,12 @@ export default function VotingPage() {
   }, []);
 
   const handleVote = async (contestantId: string) => {
-    if (!canVote || hasVotedFor(contestantId)) {
+    if (
+      !canVote ||
+      hasVotedFor(contestantId) ||
+      votingStopped ||
+      !isVotingActive
+    ) {
       return;
     }
 
@@ -63,8 +78,11 @@ export default function VotingPage() {
 
     try {
       // Simulate potential vote submission failure for testing error boundaries
-      if (Math.random() < 0.1) { // 10% chance of failure
-        throw new Error(`Failed to submit vote for ${contestants.find(c => c.id === contestantId)?.name}`);
+      if (Math.random() < 0.1) {
+        // 10% chance of failure
+        throw new Error(
+          `Failed to submit vote for ${contestants.find(c => c.id === contestantId)?.name}`
+        );
       }
 
       // Simulate API call
@@ -75,9 +93,11 @@ export default function VotingPage() {
 
       // Update contestant vote count
       updateContestantVotes(contestantId, 1);
-
     } catch (err) {
-      const error = err instanceof Error ? err.message : 'Failed to submit vote. Please try again.';
+      const error =
+        err instanceof Error
+          ? err.message
+          : 'Failed to submit vote. Please try again.';
       setError(error);
       throw err; // Re-throw to trigger voting error boundary
     } finally {
@@ -90,7 +110,25 @@ export default function VotingPage() {
     window.location.reload();
   };
 
-  const totalVotes = contestants.reduce((sum, contestant) => sum + contestant.voteCount, 0);
+  const handleStopVoting = () => {
+    // Stop all voting activities
+    setVotingStopped(true);
+
+    // Stop live updates polling
+    stopPolling();
+
+    // Update voting session to be inactive with current time as end time
+    setVotingSession(prev => ({
+      ...prev,
+      isActive: false,
+      endTime: Date.now(),
+    }));
+  };
+
+  const totalVotes = contestants.reduce(
+    (sum, contestant) => sum + contestant.voteCount,
+    0
+  );
 
   if (isLoading) {
     return (
@@ -118,12 +156,13 @@ export default function VotingPage() {
       <div className="min-h-screen bg-gray-50">
         <VotingHeader
           isVotingActive={isVotingActive}
-          endTime={votingSession.endTime}
+          endTime={votingStopped ? Date.now() : votingSession.endTime}
           totalVotes={totalVotes}
           remainingVotes={voteState.remainingVotes}
           maxVotes={VOTING_CONFIG.MAX_VOTES_PER_USER}
+          onStopVoting={handleStopVoting}
         />
-        
+
         <main>
           <VotingErrorBoundary>
             <ContestantGrid
@@ -140,10 +179,11 @@ export default function VotingPage() {
         <footer className="bg-white border-t border-gray-200 py-8 mt-12">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <p className="text-gray-600">
-              © 2025 America's Got Talent Live Voting System
+              © 2025 America&apos;s Got Talent Live Voting System
             </p>
             <p className="text-sm text-gray-500 mt-2">
-              Vote responsibly. Each user can vote up to {VOTING_CONFIG.MAX_VOTES_PER_USER} times.
+              Vote responsibly. Each user can vote up to{' '}
+              {VOTING_CONFIG.MAX_VOTES_PER_USER} times.
             </p>
           </div>
         </footer>

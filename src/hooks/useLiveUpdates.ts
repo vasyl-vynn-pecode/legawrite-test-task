@@ -21,7 +21,8 @@ export function useLiveUpdates({
   initialContestants,
   isActive = true,
 }: UseLiveUpdatesProps): UseLiveUpdatesReturn {
-  const [contestants, setContestants] = useState<Contestant[]>(initialContestants);
+  const [contestants, setContestants] =
+    useState<Contestant[]>(initialContestants);
   const [isPolling, setIsPolling] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const isActiveRef = useRef(isActive);
@@ -42,7 +43,7 @@ export function useLiveUpdates({
     setContestants(prevContestants =>
       prevContestants.map(contestant => ({
         ...contestant,
-        voteCount: contestant.voteCount + Math.floor(Math.random() * 3),
+        voteCount: contestant.voteCount + Math.floor(Math.random() * 200),
       }))
     );
   }, []);
@@ -65,15 +66,18 @@ export function useLiveUpdates({
     }
   }, []);
 
-  const updateContestantVotes = useCallback((contestantId: string, increment: number) => {
-    setContestants(prevContestants =>
-      prevContestants.map(contestant =>
-        contestant.id === contestantId
-          ? { ...contestant, voteCount: contestant.voteCount + increment }
-          : contestant
-      )
-    );
-  }, []);
+  const updateContestantVotes = useCallback(
+    (contestantId: string, increment: number) => {
+      setContestants(prevContestants =>
+        prevContestants.map(contestant =>
+          contestant.id === contestantId
+            ? { ...contestant, voteCount: contestant.voteCount + increment }
+            : contestant
+        )
+      );
+    },
+    []
+  );
 
   // Auto-start polling when component mounts if active
   useEffect(() => {
