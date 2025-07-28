@@ -13,15 +13,16 @@ import { useLiveUpdates } from '@/hooks/useLiveUpdates';
 import { VOTING_CONFIG } from '@/lib/constants';
 
 export default function VotingPage() {
-  const [votingSession] = React.useState(mockVotingSession);
+  const [votingSession, setVotingSession] = React.useState(mockVotingSession);
   const [isLoading, setIsLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
   const [votingStates, setVotingStates] = React.useState<Record<string, boolean>>({});
+  const [votingStopped, setVotingStopped] = React.useState(false);
 
   // Use custom hooks for isolated state management
   const { voteState, canVote, hasVotedFor, recordVote, isInitialized } = useVoteLimit();
-  const isVotingActive = votingSession.isActive && Date.now() < votingSession.endTime;
-  const { contestants, updateContestantVotes } = useLiveUpdates({
+  const isVotingActive = !votingStopped && votingSession.isActive && Date.now() < votingSession.endTime;
+  const { contestants, updateContestantVotes, stopPolling } = useLiveUpdates({
     initialContestants: mockContestants,
     isActive: isVotingActive,
   });
@@ -54,7 +55,7 @@ export default function VotingPage() {
   }, []);
 
   const handleVote = async (contestantId: string) => {
-    if (!canVote || hasVotedFor(contestantId)) {
+    if (!canVote || hasVotedFor(contestantId) || votingStopped || !isVotingActive) {
       return;
     }
 
@@ -90,6 +91,21 @@ export default function VotingPage() {
     window.location.reload();
   };
 
+  const handleStopVoting = () => {
+    // Stop all voting activities
+    setVotingStopped(true);
+    
+    // Stop live updates polling
+    stopPolling();
+    
+    // Update voting session to be inactive with current time as end time
+    setVotingSession(prev => ({
+      ...prev,
+      isActive: false,
+      endTime: Date.now()
+    }));
+  };
+
   const totalVotes = contestants.reduce((sum, contestant) => sum + contestant.voteCount, 0);
 
   if (isLoading) {
@@ -118,10 +134,11 @@ export default function VotingPage() {
       <div className="min-h-screen bg-gray-50">
         <VotingHeader
           isVotingActive={isVotingActive}
-          endTime={votingSession.endTime}
+          endTime={votingStopped ? Date.now() : votingSession.endTime}
           totalVotes={totalVotes}
           remainingVotes={voteState.remainingVotes}
           maxVotes={VOTING_CONFIG.MAX_VOTES_PER_USER}
+          onStopVoting={handleStopVoting}
         />
         
         <main>

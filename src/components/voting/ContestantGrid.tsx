@@ -55,7 +55,7 @@ export function ContestantGrid({
               onVote={onVote}
               hasVoted={votedContestants.includes(contestant.id)}
               isVoting={votingStates[contestant.id] || false}
-              canVote={canVote}
+              canVote={canVote && isVotingActive}
               remainingVotes={remainingVotes}
             />
           </motion.div>

@@ -485,5 +485,139 @@ git commit -m "Add comprehensive animations for enhanced user experience..."
 
 ---
 
+## Visual Design Enhancement Prompt
+**Prompt**: Improve the visual design of the component located at: /src/components/voting/VotingHeader.tsx. Make it more engaging and modern. For example, apply styles like liquid glass, glassmorphism, gradients, subtle shadows, or animated backgrounds. Use CSS or Tailwind CSS to achieve a sleek and appealing look while keeping the layout responsive and accessible. Focus on enhancing the overall visual impact without cluttering the UI.
+
+**Date**: 2025-07-28
+
+**Action Taken**: 
+- **Complete Visual Redesign**: Enhanced VotingHeader with modern glassmorphism design and animated elements
+
+**Major Visual Improvements**:
+- **Animated Background**: Deep violet/purple/indigo gradient with floating particle orbs
+  - 3 floating orbs with different sizes, colors, and movement patterns
+  - Physics-based animations with varying duration (8s, 10s, 12s)
+  - Continuous movement creating atmospheric depth
+
+- **Glassmorphism Cards**: Complete redesign of stats cards
+  - Enhanced backdrop-blur-xl with bg-white/15 transparency
+  - Color-coded glow effects for each card (blue, emerald, yellow, green/red)
+  - 3D hover effects with rotateY transformations
+  - Improved shadow effects and border styling
+
+- **Typography Enhancement**: 
+  - Larger title (5xl to 7xl) with enhanced text shadows
+  - Strong drop shadows for better contrast against animated background
+  - Improved subtitle with glassmorphism pill design
+
+- **Advanced Animations**:
+  - Rotating clock icon (20s continuous rotation)
+  - Bouncing trophy with scale and rotation effects
+  - Enhanced LIVE status indicator with pulsing box-shadow
+  - Staggered card entrance animations with delays
+
+- **Decorative Elements**:
+  - Animated SVG wave at bottom with morphing path
+  - Full-width wave spanning entire viewport
+  - Continuous wave animation creating fluid movement
+
+**Files Created/Modified**:
+- src/components/voting/VotingHeader.tsx (complete visual redesign with glassmorphism)
+
+**Key Features**:
+- 🌟 Dynamic animated background with floating particle orbs
+- 💎 Liquid glass cards with backdrop-blur and transparency effects
+- 🎨 Color-coded visual feedback with gradient glow effects
+- 🎯 3D hover interactions with perspective transforms
+- 🌊 Animated decorative wave with morphing SVG paths
+- ⚡ Enhanced micro-animations for all interactive elements
+- 📱 Maintained responsive design across all breakpoints
+- ♿ Preserved accessibility with proper contrast ratios
+
+---
+
+## Stop Voting Button Addition Prompt
+**Prompt**: '/Users/fw00004/Documents/GitHub/legawrite-test-task/src/components/voting/VotingHeader.tsx'\ Add a small button at the top right corner that will stop voting
+
+**Date**: 2025-07-28
+
+**Action Taken**: 
+- **Stop Voting Button**: Added functional stop voting button to VotingHeader component
+
+**Button Features**:
+- **Position**: Top right corner with absolute positioning (top-4 right-4 z-20)
+- **Visibility**: Conditionally rendered only when voting is active and callback is provided
+- **Design**: Matches glassmorphism theme with semi-transparent glass background
+- **Icon**: Animated stop icon (Square) with continuous rotation and scaling
+- **Interactions**: Hover scale (1.05x) and tap scale (0.95x) for tactile feedback
+
+**Visual Design**:
+- **Glassmorphism**: bg-white/15 backdrop-blur-xl with border border-red-300/40
+- **Glow Effect**: Red/pink gradient background with blur for atmospheric depth
+- **Animation**: Entrance animation with opacity and scale fade-in
+- **Hover States**: Enhanced glow on hover with transition effects
+
+**Technical Implementation**:
+- **Props**: Added optional onStopVoting?: () => void prop to VotingHeaderProps
+- **Conditional Rendering**: Only shows when isVotingActive && onStopVoting
+- **Z-Index**: High z-index (20) ensures button stays above all elements
+- **Responsive**: Maintains consistent positioning across screen sizes
+
+**Files Created/Modified**:
+- src/components/voting/VotingHeader.tsx (added stop voting button with glassmorphism design)
+
+**Integration**: Button ready for logic implementation with callback prop system
+
+---
+
+## Stop Voting Logic Implementation Prompt  
+**Prompt**: Add logic for the stop voting button. Now this button is not visible. The button should simulate full voting process closed, without not allowing to vote and not changing total votes after click. Also time left should be stopped and reset to 0.
+
+**Date**: 2025-07-28
+
+**Action Taken**: 
+- **Complete Stop Voting Logic**: Implemented comprehensive stop voting functionality across the application
+
+**Main Page Logic (src/app/page.tsx)**:
+- **State Management**: Added votingStopped state to track manual voting termination
+- **Voting Session Control**: Made votingSession mutable with setVotingSession
+- **Enhanced isVotingActive**: Updated logic to include votingStopped check
+- **Stop Handler**: Created handleStopVoting function that:
+  - Sets votingStopped to true (prevents all future voting)
+  - Calls stopPolling() to halt live vote count updates
+  - Updates voting session to inactive with current time as endTime
+- **Vote Prevention**: Enhanced handleVote to check votingStopped and isVotingActive
+- **Timer Control**: Pass current time as endTime when voting is stopped
+
+**VotingHeader Enhancements**:
+- **Timer Logic**: Modified timer effect to stop updating when voting is inactive
+- **Button Integration**: Connected onStopVoting prop to handleStopVoting function
+- **Time Display**: Shows "CLOSED" immediately when voting is stopped
+
+**ContestantGrid Updates**:
+- **Vote Button Logic**: Enhanced canVote prop to include isVotingActive check
+- **Prevents Voting**: Ensures no votes can be cast when voting is stopped
+
+**Functional Requirements Met**:
+✅ **Button Visibility**: Now visible when voting is active
+✅ **Vote Prevention**: No new votes allowed after clicking stop
+✅ **Total Votes Frozen**: Live polling stops, no further vote count changes
+✅ **Timer Reset**: Time left stops updating and shows "CLOSED"
+✅ **Complete Process Closure**: Simulates full voting session termination
+
+**Files Created/Modified**:
+- src/app/page.tsx (main stop voting logic and state management)
+- src/components/voting/VotingHeader.tsx (timer control and button integration)
+- src/components/voting/ContestantGrid.tsx (vote prevention logic)
+
+**Technical Features**:
+- **Immediate Effect**: Voting stops instantly upon button click
+- **Persistent State**: Voting remains stopped until page reload
+- **UI Consistency**: All components reflect stopped state simultaneously
+- **Error Prevention**: Multiple layers of vote prevention logic
+- **Clean State Management**: Proper state isolation and prop drilling
+
+---
+
 ## Future Prompts
 (All subsequent prompts will be logged here with date, action taken, and files modified)
